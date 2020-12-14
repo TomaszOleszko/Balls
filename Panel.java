@@ -1,5 +1,7 @@
 package com.mycompany.kolekcje;
 
+package kulki;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -8,8 +10,10 @@ import java.util.Random;
 
 public class Panel extends JPanel {
     private static final Random random = new Random();
+    private static byte mous=0;
     protected ArrayList<Kula> listaKul;
     protected int size = 20;
+
 
     //dla 30fps -> 1s/30 = 0,033s
     public Panel() {
@@ -30,7 +34,9 @@ public class Panel extends JPanel {
             g.drawOval(k.xy.getX(), k.xy.getY(), k.size, k.size);
         }
         g.setColor(Color.YELLOW);
-        g.drawString(Integer.toString(listaKul.size()), 40, 40);
+        g.drawString("My balls: "+(listaKul.size()), 40, 40);
+        g.drawString("size now: "+(size/2)+"px",40,55);
+        g.drawString("Status: "+(mous == 0 ?"Running": "Stop"),40,70);
     }
 
     private class Event implements MouseListener, ActionListener, MouseWheelListener {
@@ -50,6 +56,7 @@ public class Panel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
+            mous = 0;
             for (Kula k : listaKul) {
                 k.melt();
             }
@@ -57,6 +64,7 @@ public class Panel extends JPanel {
 
         @Override
         public void mouseExited(MouseEvent e) {
+            mous = 1;
             for (Kula k : listaKul) {
                 k.freeze();
             }
@@ -74,6 +82,10 @@ public class Panel extends JPanel {
         public void mouseWheelMoved(MouseWheelEvent e) {
             int g = e.getWheelRotation();
             size -= g * 5;
+            if(size>45)
+                size = 45;
+            if(size<5)
+                size = 5;
         }
     }
 
@@ -106,6 +118,7 @@ public class Panel extends JPanel {
 
         public void update() {
             xy.set(this.xy.add(this.speed));
+
             if (this.xy.getX() <= 0 || this.xy.getX() >= getWidth()) {
                 this.speed.setX(-speed.getX());
             }
@@ -126,7 +139,7 @@ public class Panel extends JPanel {
         }
 
         private void calcCollision(Kula kula) {
-            Vector2D delta = xy.sub(kula.xy);
+            Vector2D delta = this.xy.sub(kula.xy);
             double r = this.getRadius() + kula.getRadius();
             double dist = delta.dot(delta);
 
@@ -176,8 +189,3 @@ public class Panel extends JPanel {
         }
     }
 }
-
-
-
-
-
